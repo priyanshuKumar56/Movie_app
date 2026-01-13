@@ -16,7 +16,7 @@ require('dotenv').config();
 const Movie = require('../models/Movie');
 
 // MongoDB Connection
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/cinesphere';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/movieapp';
 
 /**
  * Get fallback movie data with all required fields

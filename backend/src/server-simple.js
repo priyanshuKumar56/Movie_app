@@ -17,7 +17,7 @@ app.get('/health', (req, res) => {
 });
 
 // Start server without waiting for anything
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/cinesphere')
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/movieapp')
   .then(() => {
     console.log('✅ MongoDB connected');
     

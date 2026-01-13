@@ -74,6 +74,18 @@ export const removeFromWatchlist = createAsyncThunk(
   }
 );
 
+export const changePassword = createAsyncThunk(
+  'auth/changePassword',
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await api.put('/auth/change-password', data);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to change password');
+    }
+  }
+);
+
 const initialState = {
   user: null,
   token: localStorage.getItem('token'),

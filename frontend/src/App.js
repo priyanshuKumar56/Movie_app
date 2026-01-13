@@ -13,6 +13,7 @@ import Register from './pages/Register';
 import MovieDetails from './pages/MovieDetails';
 import Search from './pages/Search';
 import Admin from './pages/Admin';
+import AdminLogin from './pages/AdminLogin';
 import Profile from './pages/Profile';
 
 import ProtectedRoute from './components/common/ProtectedRoute';
@@ -58,6 +59,7 @@ function App() {
           {/* Public Routes */}
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/register" element={<Register />} />
 
           {/* User Routes (Listing Page & Discovery) */}

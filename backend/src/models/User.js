@@ -318,7 +318,10 @@ userSchema.methods.removeFromWatchlist = async function (movieId) {
  * Find user by credentials
  */
 userSchema.statics.findByCredentials = async function (email, password) {
-  const user = await this.findOne({ email }).select('+password');
+  // Normalize email to ensure case-insensitive matching
+  const normalizedEmail = email ? email.toLowerCase().trim() : '';
+  
+  const user = await this.findOne({ email: normalizedEmail }).select('+password');
 
   if (!user) {
     throw new Error('Invalid credentials');
