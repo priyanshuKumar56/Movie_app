@@ -10,6 +10,7 @@ import * as Yup from 'yup';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
+import api from '../../utils/api';
 
 const GENRES = [
   'Action', 'Adventure', 'Comedy', 'Drama', 'Fantasy', 
@@ -45,9 +46,7 @@ const AdminCreateMovie = () => {
     }),
     onSubmit: async (values, { resetForm }) => {
       try {
-        await axios.post('http://localhost:5000/api/v1/movies', values, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        await api.post('/movies', values);
         toast.success('Movie created successfully!');
         resetForm();
       } catch (error) {
@@ -76,9 +75,7 @@ const AdminCreateMovie = () => {
       try {
         const movies = JSON.parse(e.target.result);
         
-        await axios.post('http://localhost:5000/api/v1/movies/import', movies, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        await api.post('/movies/import', movies);
         
         toast.success('Movies imported successfully!');
         setJsonFile(null);

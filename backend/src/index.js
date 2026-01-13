@@ -10,6 +10,7 @@ require('dotenv').config();
 
 const errorHandler = require('./middleware/errorHandler');
 const rateLimiter = require('./middleware/rateLimiter');
+const { connectRedis } = require('./config/redis');
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
@@ -95,6 +96,18 @@ app.use(errorHandler);
 // ============================================
 const PORT = process.env.PORT || 5000;
 
+// Initialize Redis connection (non-blocking)
+connectRedis().then((client) => {
+  if (client) {
+    console.log('✅ Redis connected successfully');
+  } else {
+    console.log('⚠️  Redis not available - running without cache');
+  }
+}).catch((err) => {
+  console.log('⚠️  Redis connection failed - running without cache:', err.message);
+});
+
+// Connect to MongoDB and start server
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/movieapp')
   .then(() => {
     console.log('✅ MongoDB connected successfully');
@@ -115,12 +128,22 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/movieapp'
 process.on('SIGTERM', async () => {
   console.log('SIGTERM received: closing server');
   await mongoose.connection.close();
+  const { getRedisClient } = require('./config/redis');
+  const redisClient = getRedisClient();
+  if (redisClient) {
+    await redisClient.quit();
+  }
   process.exit(0);
 });
 
 process.on('SIGINT', async () => {
   console.log('SIGINT received: closing server');
   await mongoose.connection.close();
+  const { getRedisClient } = require('./config/redis');
+  const redisClient = getRedisClient();
+  if (redisClient) {
+    await redisClient.quit();
+  }
   process.exit(0);
 });
 

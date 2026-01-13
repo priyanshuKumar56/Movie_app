@@ -1,4 +1,4 @@
-FROM node:18-alpine AS base
+FROM node:20-alpine AS base
 WORKDIR /app
 COPY package*.json ./
 
@@ -6,7 +6,9 @@ COPY package*.json ./
 FROM base AS development
 RUN npm install
 COPY . .
+RUN mkdir -p logs
 EXPOSE 5000
+ENV NODE_ENV=development
 CMD ["npm", "run", "dev"]
 
 # Production stage
