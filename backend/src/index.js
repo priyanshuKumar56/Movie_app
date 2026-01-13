@@ -30,7 +30,7 @@ app.use(helmet({
 
 // CORS
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  origin: process.env.CORS_ORIGIN || 'https://movie-app-iota-orpin.vercel.app/',
   credentials: true,
 }));
 
