@@ -44,8 +44,6 @@ coverage/
 .temp/
 .tmp/
 
-# Docker
-.dockerignore
 
 # Frontend specific
 frontend/build/

@@ -1,25 +1,19 @@
-FROM node:18-alpine
-
-# Set working directory
+FROM node:18-alpine AS base
 WORKDIR /app
-
-# Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --only=production
-
-# Copy source code
+# Development stage
+FROM base AS development
+RUN npm install
 COPY . .
-
-# Create logs directory
-RUN mkdir -p logs
-
-# Expose port
 EXPOSE 5000
+CMD ["npm", "run", "dev"]
 
-# Set environment to production
+# Production stage
+FROM base AS production
+RUN npm ci --only=production
+COPY . .
+RUN mkdir -p logs
+EXPOSE 5000
 ENV NODE_ENV=production
-
-# Start application
 CMD ["node", "src/index.js"]
