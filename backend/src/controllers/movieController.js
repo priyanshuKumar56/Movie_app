@@ -467,3 +467,64 @@ exports.getMovieStats = async (req, res) => {
     });
   }
 };
+
+/**
+ * Bulk import movies (Admin only)
+ * @route POST /api/v1/movies/import
+ * @access Private/Admin
+ */
+exports.importMovies = async (req, res) => {
+  try {
+    const movies = req.body;
+
+    if (!Array.isArray(movies) || movies.length === 0) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Please provide an array of movies to import',
+      });
+    }
+
+    const results = {
+      success: 0,
+      failed: 0,
+      errors: [],
+    };
+
+    for (const movieData of movies) {
+      try {
+        // Add createdBy field
+        movieData.createdBy = req.user._id;
+        
+        // Basic validation check (essential fields)
+        if (!movieData.title) {
+            throw new Error('Title is required');
+        }
+
+        await Movie.create(movieData);
+        results.success++;
+      } catch (error) {
+        results.failed++;
+        results.errors.push({
+          title: movieData.title || 'Unknown',
+          error: error.message,
+        });
+      }
+    }
+
+    // Invalidate cache
+    await cacheWrapper.delPattern('movies:*');
+
+    logger.info(`Bulk import: ${results.success} success, ${results.failed} failed by ${req.user.email}`);
+
+    res.status(200).json({
+      status: 'success',
+      data: results,
+    });
+  } catch (error) {
+    logger.error('Import movies error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to import movies',
+    });
+  }
+};

@@ -32,6 +32,13 @@ router.post(
   movieController.createMovie
 );
 
+router.post(
+  '/import',
+  authenticate,
+  authorize('ADMIN'),
+  movieController.importMovies
+);
+
 router.put(
   '/:id',
   authenticate,

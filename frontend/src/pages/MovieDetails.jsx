@@ -64,93 +64,137 @@ const MovieDetails = () => {
       {/* ===== HERO BACKDROP ===== */}
       <Box 
         sx={{ 
-          height: '75vh', 
+          height: '85vh', 
           position: 'relative',
-          backgroundImage: `linear-gradient(to top, #0a0a0a, transparent), linear-gradient(to right, #0a0a0a 0%, transparent 50%), url(${currentMovie.backdropUrl || currentMovie.posterUrl})`,
+          backgroundImage: `url(${currentMovie.backdropUrl || currentMovie.posterUrl})`,
           backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          display: 'flex',
-          alignItems: 'flex-end',
-          px: 6,
-          pb: 6
+          backgroundPosition: 'center top',
         }}
       >
-        <Box sx={{ maxWidth: 700 }}>
-          <Typography variant="h2" sx={{ fontFamily: 'Space Grotesk', fontWeight: 800, mb: 2, fontSize: { xs: '2.5rem', md: '4rem' } }}>
-            {currentMovie.title}
-          </Typography>
-          
-          <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap', alignItems: 'center' }}>
-            <Chip icon={<StarRounded sx={{ color: '#FFD700 !important' }} />} label={`${currentMovie.rating} IMDb`} sx={{ bgcolor: 'rgba(255,255,255,0.1)', color: 'white' }} />
-            <Chip label={`${currentMovie.duration} min`} sx={{ bgcolor: 'rgba(255,255,255,0.1)', color: 'white' }} />
-            <Chip label={new Date(currentMovie.releaseDate).getFullYear()} sx={{ bgcolor: 'rgba(255,255,255,0.1)', color: 'white' }} />
-          </Box>
+         <Box sx={{ 
+            position: 'absolute', inset: 0,
+            background: `linear-gradient(to top, #0a0a0a 0%, #0a0a0a 5%, transparent 60%),
+                         linear-gradient(to right, #0a0a0a 0%, rgba(10,10,10,0.8) 30%, transparent 80%)`
+          }} />
 
-          <Typography variant="body1" sx={{ color: '#ccc', mb: 4, lineHeight: 1.7, maxWidth: 600, fontSize: '1.1rem' }}>
-            {currentMovie.description}
-          </Typography>
+        <Container maxWidth="xl" sx={{ height: '100%', display: 'flex', alignItems: 'center', position: 'relative', zIndex: 2 }}>
+            <Box sx={{ maxWidth: 800, mt: 10 }}>
+                <Typography variant="h1" sx={{ fontFamily: 'Space Grotesk', fontWeight: 800, mb: 2, fontSize: { xs: '3rem', md: '5rem' }, lineHeight: 0.9 }}>
+                    {currentMovie.title}
+                </Typography>
+                
+                <Box sx={{ display: 'flex', gap: 3, mb: 4, flexWrap: 'wrap', alignItems: 'center' }}>
+                    <Typography variant="subtitle1" sx={{ color: '#46d369', fontWeight: 800 }}>
+                        {parseInt(currentMovie.rating * 10)}% Match
+                    </Typography>
+                    <Typography variant="subtitle1" sx={{ color: '#ccc' }}>
+                        {new Date(currentMovie.releaseDate).getFullYear()}
+                    </Typography>
+                    <Box sx={{ px: 1, border: '1px solid #666', borderRadius: 0.5, color: '#ccc', fontSize: '0.8rem' }}>
+                        HD
+                    </Box>
+                    <Typography variant="subtitle1" sx={{ color: '#ccc' }}>
+                        {currentMovie.duration} min
+                    </Typography>
+                </Box>
 
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <Button variant="contained" startIcon={<PlayArrowRounded />} sx={{ bgcolor: 'white', color: 'black', px: 5, py: 1.5, fontWeight: 700, '&:hover': { bgcolor: '#e0e0e0' } }}>
-              Watch Now
-            </Button>
-            <Button 
-              variant="outlined" 
-              startIcon={isInWatchlist ? <InfoOutlined /> : <AddRounded />} 
-              onClick={handleWatchlistToggle}
-              sx={{ 
-                borderColor: isInWatchlist ? '#00D1FF' : 'white', 
-                color: isInWatchlist ? '#00D1FF' : 'white', 
-                px: 4, 
-                py: 1.5, 
-                fontWeight: 600,
-                '&:hover': { borderColor: '#00D1FF', color: '#00D1FF' }
-              }}
-            >
-              {isInWatchlist ? 'In Watchlist' : 'Add to List'}
-            </Button>
-          </Box>
-        </Box>
+                <Box sx={{ display: 'flex', gap: 2, mb: 4 }}>
+                    <Button 
+                        variant="contained" 
+                        startIcon={<PlayArrowRounded sx={{ fontSize: 32 }} />} 
+                        sx={{ 
+                            bgcolor: 'white', color: 'black', 
+                            px: 5, py: 1.5, 
+                            fontWeight: 700, fontSize: '1.2rem',
+                            borderRadius: 2,
+                            '&:hover': { bgcolor: '#e0e0e0', transform: 'scale(1.05)' } 
+                        }}
+                    >
+                        Play
+                    </Button>
+                    <Button 
+                        variant="contained" 
+                        startIcon={isInWatchlist ? <InfoOutlined /> : <AddRounded />} 
+                        onClick={handleWatchlistToggle}
+                        sx={{ 
+                            bgcolor: 'rgba(109, 109, 110, 0.7)', 
+                            color: 'white', 
+                            px: 4, py: 1.5, 
+                            fontWeight: 600, fontSize: '1.1rem',
+                            borderRadius: 2,
+                            backdropFilter: 'blur(10px)',
+                            '&:hover': { bgcolor: 'rgba(109, 109, 110, 0.5)', transform: 'scale(1.05)' }
+                        }}
+                    >
+                        {isInWatchlist ? 'Remove from List' : 'My List'}
+                    </Button>
+                </Box>
+                
+                <Typography variant="body1" sx={{ color: '#ccc', mb: 4, lineHeight: 1.6, maxWidth: 700, fontSize: '1.1rem' }}>
+                    {currentMovie.description}
+                </Typography>
+
+                <Box sx={{ display: 'flex', gap: 4 }}>
+                   <Box>
+                       <Typography variant="caption" color="#777">Starring</Typography>
+                       <Typography variant="body2" color="#ddd">
+                          {currentMovie.cast?.map(c => c.name).slice(0, 3).join(', ') || 'Unknown'}
+                       </Typography>
+                   </Box>
+                   <Box>
+                       <Typography variant="caption" color="#777">Genres</Typography>
+                       <Typography variant="body2" color="#ddd">
+                           {currentMovie.genres?.join(', ')}
+                       </Typography>
+                   </Box>
+                </Box>
+            </Box>
+        </Container>
       </Box>
 
-      {/* ===== DETAILS SECTION ===== */}
-      <Container maxWidth="lg" sx={{ py: 6 }}>
+      {/* ===== DETAILED INFO SECTION ===== */}
+      <Container maxWidth="xl" sx={{ py: 6 }}>
         <Grid container spacing={6}>
-          <Grid item xs={12} md={8}>
-            <Typography variant="h5" sx={{ fontFamily: 'Space Grotesk', fontWeight: 700, mb: 3 }}>About This Movie</Typography>
+            <Grid item xs={12} md={8}>
+                 <Typography variant="h5" sx={{ fontFamily: 'Space Grotesk', fontWeight: 700, mb: 4, display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <div style={{ width: 4, height: 24, background: '#E50914', borderRadius: 2 }} />
+                    Cast & Crew
+                 </Typography>
+                 
+                 <Box sx={{ display: 'flex', gap: 3, overflowX: 'auto', pb: 2, scrollbarWidth: 'none' }}>
+                    {currentMovie.cast?.map((c, i) => (
+                        <Box key={i} sx={{ minWidth: 140, textAlign: 'center' }}>
+                            <Avatar 
+                                src={c.profileUrl} 
+                                sx={{ width: 100, height: 100, mb: 1, mx: 'auto', border: '2px solid #333' }}
+                            />
+                            <Typography variant="body2" fontWeight="bold">{c.name}</Typography>
+                            <Typography variant="caption" color="gray">{c.character}</Typography>
+                        </Box>
+                    ))}
+                    {(!currentMovie.cast || currentMovie.cast.length === 0) && (
+                        <Typography color="gray">No cast information available.</Typography>
+                    )}
+                 </Box>
+            </Grid>
             
-            <Box sx={{ mb: 4 }}>
-              <Typography variant="subtitle2" color="gray" gutterBottom>Genres</Typography>
-              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                {currentMovie.genres?.map(g => (
-                  <Chip key={g} label={g} variant="outlined" sx={{ color: '#00D1FF', borderColor: '#00D1FF' }} />
-                ))}
-              </Box>
-            </Box>
-
-            <Box sx={{ mb: 4 }}>
-              <Typography variant="subtitle2" color="gray" gutterBottom>Director</Typography>
-              <Typography>{currentMovie.director || 'Unknown'}</Typography>
-            </Box>
-          </Grid>
-
-          <Grid item xs={12} md={4}>
-            <Box sx={{ p: 4, bgcolor: '#111', borderRadius: 3, border: '1px solid #222' }}>
-              <Typography variant="h6" sx={{ mb: 3, fontFamily: 'Space Grotesk' }}>Cast</Typography>
-              {currentMovie.cast?.slice(0, 5).map((c, i) => (
-                <Box key={i} sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                  <Avatar src={c.profileUrl} />
-                  <Box>
-                    <Typography variant="body2" fontWeight="bold">{c.name}</Typography>
-                    <Typography variant="caption" color="gray">{c.character}</Typography>
-                  </Box>
+            <Grid item xs={12} md={4}>
+                <Box sx={{ p: 3, bgcolor: '#111', borderRadius: 2 }}>
+                    <Typography variant="h6" fontWeight="bold" mb={2}>Movie Info</Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
+                        <Typography color="gray">Director</Typography>
+                        <Typography>{currentMovie.director || 'Unknown'}</Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
+                        <Typography color="gray">Language</Typography>
+                        <Typography>English</Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
+                        <Typography color="gray">Maturity Rating</Typography>
+                        <Typography sx={{ border: '1px solid gray', px: 0.5, fontSize: '0.8rem' }}>TV-MA</Typography>
+                    </Box>
                 </Box>
-              ))}
-              {(!currentMovie.cast || currentMovie.cast.length === 0) && (
-                <Typography color="gray">Cast information not available.</Typography>
-              )}
-            </Box>
-          </Grid>
+            </Grid>
         </Grid>
       </Container>
     </Box>

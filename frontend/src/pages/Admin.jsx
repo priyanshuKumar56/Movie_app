@@ -10,6 +10,8 @@ import AdminDashboard from '../components/admin/AdminDashboard';
 import AdminMovies from '../components/admin/AdminMovies';
 import AdminSettings from '../components/admin/AdminSettings';
 
+import AdminCreateMovie from '../components/admin/AdminCreateMovie';
+
 const Admin = () => {
   const dispatch = useDispatch();
   const { movies, loading } = useSelector((state) => state.movies);
@@ -29,6 +31,7 @@ const Admin = () => {
         
         {activeTab === 'Dashboard' && <AdminDashboard movies={movies} />}
         {activeTab === 'Movies' && <AdminMovies movies={movies} loading={loading} />}
+        {activeTab === 'Add Movie' && <AdminCreateMovie />}
         {activeTab === 'Settings' && <AdminSettings />}
         
         {activeTab === 'Users' && (

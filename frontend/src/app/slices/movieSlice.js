@@ -77,6 +77,25 @@ export const updateMovie = createAsyncThunk(
   }
 );
 
+// ... (previous imports)
+
+export const fetchMoviesByCategory = createAsyncThunk(
+  'movies/fetchMoviesByCategory',
+  async ({ category, genre, sort = '-rating', limit = 15 }, { rejectWithValue }) => {
+    try {
+      const params = { limit, sort };
+      if (genre) params.genre = genre;
+      
+      const response = await api.get('/movies', { params });
+      return { category, data: response.data.data };
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch category');
+    }
+  }
+);
+
+// ... (other thunks: fetchMovies, fetchMovieById, etc. keep them)
+
 export const deleteMovie = createAsyncThunk(
   'movies/deleteMovie',
   async (id, { rejectWithValue }) => {
@@ -94,6 +113,18 @@ const initialState = {
   currentMovie: null,
   trending: [],
   searchResults: [],
+  // New state for categorized rows
+  categories: {
+    topRated: { data: [], loading: false, loaded: false },
+    newReleases: { data: [], loading: false, loaded: false },
+    action: { data: [], loading: false, loaded: false },
+    comedy: { data: [], loading: false, loaded: false },
+    scifi: { data: [], loading: false, loaded: false },
+    drama: { data: [], loading: false, loaded: false },
+    horror: { data: [], loading: false, loaded: false },
+    romance: { data: [], loading: false, loaded: false },
+    thriller: { data: [], loading: false, loaded: false },
+  },
   pagination: {
     page: 1,
     limit: 20,
@@ -131,7 +162,7 @@ const movieSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Fetch Movies
+      // Fetch Movies (General)
       .addCase(fetchMovies.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -145,7 +176,28 @@ const movieSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      // Fetch Movie by ID
+      // Fetch Movies By Category
+      .addCase(fetchMoviesByCategory.pending, (state, action) => {
+        const { category } = action.meta.arg;
+        if (state.categories[category]) {
+            state.categories[category].loading = true;
+        }
+      })
+      .addCase(fetchMoviesByCategory.fulfilled, (state, action) => {
+        const { category, data } = action.payload;
+        if (state.categories[category]) {
+            state.categories[category].data = data;
+            state.categories[category].loading = false;
+            state.categories[category].loaded = true;
+        }
+      })
+      .addCase(fetchMoviesByCategory.rejected, (state, action) => {
+        const { category } = action.meta.arg;
+        if (state.categories[category]) {
+            state.categories[category].loading = false;
+        }
+      })
+      // ... (Rest of existing reducers for fetchMovieById, searchMovies, etc.)
       .addCase(fetchMovieById.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -158,7 +210,6 @@ const movieSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      // Search Movies
       .addCase(searchMovies.pending, (state) => {
         state.searchLoading = true;
         state.error = null;
@@ -171,15 +222,12 @@ const movieSlice = createSlice({
         state.searchLoading = false;
         state.error = action.payload;
       })
-      // Fetch Trending
       .addCase(fetchTrendingMovies.fulfilled, (state, action) => {
         state.trending = action.payload;
       })
-      // Create Movie
       .addCase(createMovie.fulfilled, (state, action) => {
         state.movies.unshift(action.payload);
       })
-      // Update Movie
       .addCase(updateMovie.fulfilled, (state, action) => {
         const index = state.movies.findIndex((m) => m._id === action.payload._id);
         if (index !== -1) {
@@ -189,7 +237,6 @@ const movieSlice = createSlice({
           state.currentMovie = action.payload;
         }
       })
-      // Delete Movie
       .addCase(deleteMovie.fulfilled, (state, action) => {
         state.movies = state.movies.filter((m) => m._id !== action.payload);
       });

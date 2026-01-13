@@ -6,8 +6,10 @@ import {
 } from '@mui/material';
 import { 
   DashboardRounded, MovieRounded, PeopleRounded, 
-  SettingsRounded, LogoutRounded, SecurityRounded 
+  SettingsRounded, LogoutRounded, SecurityRounded,
+  CreateNewFolderRounded 
 } from '@mui/icons-material';
+
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../../app/slices/authSlice';
@@ -27,6 +29,7 @@ const AdminSidebar = ({ activeTab, setActiveTab }) => {
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardRounded /> },
     { text: 'Movies', icon: <MovieRounded /> },
+    { text: 'Add Movie', icon: <CreateNewFolderRounded /> },
     { text: 'Users', icon: <PeopleRounded /> },
     { text: 'Settings', icon: <SettingsRounded /> },
   ];

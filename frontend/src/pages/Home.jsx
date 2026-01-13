@@ -1,23 +1,24 @@
-
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, Typography, Button, Container, IconButton, TextField, InputAdornment, Menu, MenuItem, Avatar, CircularProgress, Tooltip } from '@mui/material';
-import { PlayArrowRounded, AddRounded, InfoOutlined, SearchRounded, NotificationsRounded, ArrowDropDownRounded, AdminPanelSettingsRounded, LogoutRounded, PersonRounded } from '@mui/icons-material';
+import { Box, Typography, Button, Container, IconButton, Tooltip, Menu, MenuItem, Avatar, CircularProgress } from '@mui/material';
+import { PlayArrowRounded,  InfoOutlined, SearchRounded, NotificationsRounded, ArrowDropDownRounded, AdminPanelSettingsRounded, LogoutRounded, PersonRounded } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { fetchMovies, fetchTrendingMovies } from '../app/slices/movieSlice';
+import { fetchTrendingMovies } from '../app/slices/movieSlice';
 import { logout } from '../app/slices/authSlice';
 import MovieRow from '../components/movies/MovieRow';
+import LazyRow from '../components/movies/LazyRow';
 
 const Home = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { movies, trending, loading } = useSelector((state) => state.movies);
+  // We only need trending for hero and first row initially
+  const { trending, loading } = useSelector((state) => state.movies);
   const { user } = useSelector((state) => state.auth);
   const [anchorEl, setAnchorEl] = useState(null);
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchMovies({ page: 1, limit: 50, sort: '-rating' }));
+    // Initial fetch only for hero and trending
     dispatch(fetchTrendingMovies(10));
     
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -25,21 +26,14 @@ const Home = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [dispatch]);
 
-  const heroMovie = trending[0] || movies[0];
-
-  // Categorize movies
-  const topRated = [...movies].sort((a, b) => b.rating - a.rating).slice(0, 15);
-  const newReleases = [...movies].sort((a, b) => new Date(b.releaseDate) - new Date(a.releaseDate)).slice(0, 15);
-  const actionMovies = movies.filter(m => m.genres?.includes('Action')).slice(0, 15);
-  const dramaMovies = movies.filter(m => m.genres?.includes('Drama')).slice(0, 15);
-  const sciFiMovies = movies.filter(m => m.genres?.includes('Sci-Fi')).slice(0, 15);
+  const heroMovie = trending[0];
 
   const handleLogout = () => {
     dispatch(logout());
     navigate('/login');
   };
 
-  if (loading && movies.length === 0) {
+  if (loading && trending.length === 0) {
     return <Box sx={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', bgcolor: '#050505' }}><CircularProgress sx={{ color: '#00D1FF' }} /></Box>;
   }
 
@@ -154,99 +148,136 @@ const Home = () => {
         <Box 
           sx={{ 
             position: 'relative',
-            height: '90vh',
+            height: { xs: '85vh', md: '100vh' },
             width: '100%',
-            backgroundImage: `url(${heroMovie.backdropUrl || heroMovie.posterUrl})`,
+            backgroundImage: `url(${"https://s1.ticketm.net/dam/a/07e/5f4c4838-fbca-431a-abbe-187f0fdf507e_TABLET_LANDSCAPE_LARGE_16_9.jpg" || heroMovie.posterUrl})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center top',
             overflow: 'hidden'
           }}
         >
-          {/* Gradient Overlays */}
+          {/* Enhanced Gradient Overlays */}
           <Box sx={{ 
             position: 'absolute', inset: 0,
-            background: `linear-gradient(to top, #050505 0%, rgba(5,5,5,0.8) 20%, transparent 60%),
-                         linear-gradient(to right, rgba(5,5,5,0.9) 0%, rgba(5,5,5,0.4) 50%, transparent 100%)`
+            background: `radial-gradient(circle at 70% 20%, transparent 0%, #050505 150%),
+                         linear-gradient(to top, #050505 0%, rgba(5,5,5,0.6) 15%, transparent 50%),
+                         linear-gradient(to right, #050505 0%, rgba(5,5,5,0.8) 30%, transparent 70%)`
           }} />
 
           <Container maxWidth="xl" sx={{ height: '100%', display: 'flex', alignItems: 'center', position: 'relative', zIndex: 2 }}>
-            <Box sx={{ maxWidth: 700, mt: 10 }}>
+            <Box sx={{ maxWidth: 800, mt: { xs: 0, md: -10 }, px: { xs: 2, md: 0 } }}>
+               <Box 
+                 sx={{ 
+                   display: 'inline-flex', 
+                   alignItems: 'center', 
+                   gap: 1, 
+                   mb: 3, 
+                   bgcolor: 'rgba(229, 9, 20, 0.2)', 
+                   border: '1px solid rgba(229, 9, 20, 0.5)', 
+                   px: 2, py: 0.5, 
+                   borderRadius: 50,
+                   backdropFilter: 'blur(5px)'
+                 }}
+               >
+                 <Typography variant="caption" sx={{ color: '#E50914', fontWeight: 800, letterSpacing: 1 }}>
+                    #1 in Movies Today
+                 </Typography>
+               </Box>
+
               <Typography 
                 variant="h1" 
                 sx={{ 
                   fontFamily: 'Space Grotesk', 
                   fontWeight: 800, 
-                  fontSize: { xs: '3rem', md: '5rem' },
-                  lineHeight: 1,
-                  mb: 2,
-                  textShadow: '0 10px 30px rgba(0,0,0,0.5)'
+                  fontSize: { xs: '3rem', md: '6rem' },
+                  lineHeight: 0.9,
+                  mb: 3,
+                  textShadow: '0 20px 60px rgba(0,0,0,0.8)',
+                  background: 'linear-gradient(to right, #fff, #bbb)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
                 }}
               >
                 {heroMovie.title}
               </Typography>
               
-              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 3 }}>
-                <Typography variant="subtitle1" sx={{ color: '#00D1FF', fontWeight: 700, bgcolor: 'rgba(0,209,255,0.1)', px: 1, borderRadius: 1 }}>
-                  {heroMovie.rating} IMDb
-                </Typography>
-                <Typography variant="subtitle1" sx={{ color: '#ccc' }}>
+              <Box sx={{ display: 'flex', gap: 3, alignItems: 'center', mb: 4, flexWrap: 'wrap' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                   <Typography variant="subtitle1" sx={{ color: '#46d369', fontWeight: 800 }}>
+                     {parseInt(heroMovie.rating * 10)}% Match
+                   </Typography>
+                </Box>
+                <Typography variant="subtitle1" sx={{ color: '#eee' }}>
                   {new Date(heroMovie.releaseDate).getFullYear()}
                 </Typography>
-                <Typography variant="subtitle1" sx={{ color: '#ccc' }}>•</Typography>
-                <Typography variant="subtitle1" sx={{ color: '#ccc' }}>
-                  {heroMovie.genres?.slice(0, 3).join(', ')}
+                <Box sx={{ px: 1, border: '1px solid #666', borderRadius: 0.5, color: '#ccc', fontSize: '0.8rem' }}>
+                   4K Ultra HD
+                </Box>
+                <Typography variant="subtitle1" sx={{ color: '#eee' }}>
+                  {Math.floor(heroMovie.duration / 60)}h {heroMovie.duration % 60}m
+                </Typography>
+                <Typography variant="subtitle1" sx={{ color: '#ccc', display: 'flex', gap: 1 }}>
+                  {heroMovie.genres?.slice(0, 3).map((g, i) => (
+                    <span key={i} style={{ position: 'relative' }}>
+                       {i > 0 && <span style={{ marginRight: 8, color: '#555' }}>•</span>}
+                       {g}
+                    </span>
+                  ))}
                 </Typography>
               </Box>
 
               <Typography 
                 variant="body1" 
                 sx={{ 
-                  color: 'rgba(255,255,255,0.8)', 
+                  color: 'rgba(255,255,255,0.9)', 
                   mb: 5, 
-                  lineHeight: 1.8,
-                  fontSize: '1.1rem',
-                  maxWidth: 600,
+                  lineHeight: 1.6,
+                  fontSize: { xs: '1rem', md: '1.25rem' },
+                  maxWidth: 700,
                   display: '-webkit-box',
                   WebkitLineClamp: 3,
                   WebkitBoxOrient: 'vertical',
                   overflow: 'hidden',
+                  textShadow: '0 2px 5px rgba(0,0,0,0.8)'
                 }}
               >
                 {heroMovie.description}
               </Typography>
 
-              <Box sx={{ display: 'flex', gap: 2 }}>
+              <Box sx={{ display: 'flex', gap: 2.5 }}>
                 <Button 
                   variant="contained" 
                   size="large"
-                  startIcon={<PlayArrowRounded />}
+                  startIcon={<PlayArrowRounded sx={{ fontSize: 30 }} />}
                   sx={{ 
                     bgcolor: 'white', 
                     color: 'black', 
-                    px: 5, py: 1.5, 
-                    fontWeight: 700,
-                    borderRadius: '8px',
-                    fontSize: '1.1rem',
-                    '&:hover': { bgcolor: '#e0e0e0', transform: 'scale(1.05)' }
+                    px: 6, py: 1.8, 
+                    fontWeight: 800,
+                    borderRadius: 2,
+                    fontSize: '1.2rem',
+                    boxShadow: '0 0 30px rgba(255,255,255,0.2)',
+                    transition: 'all 0.3s',
+                    '&:hover': { bgcolor: '#e0e0e0', transform: 'scale(1.03)', boxShadow: '0 0 50px rgba(255,255,255,0.4)' }
                   }}
                 >
-                  Play Now
+                  Play
                 </Button>
                 <Button 
-                  variant="outlined" 
+                  variant="contained" 
                   size="large"
                   startIcon={<InfoOutlined />}
                   onClick={() => navigate(`/movies/${heroMovie._id}`)}
                   sx={{ 
-                    borderColor: 'rgba(255,255,255,0.3)', 
+                    bgcolor: 'rgba(109, 109, 110, 0.7)', 
                     color: 'white', 
-                    px: 4, py: 1.5, 
-                    fontWeight: 600,
-                    borderRadius: '8px',
-                    fontSize: '1.1rem',
-                    backdropFilter: 'blur(10px)',
-                    bgcolor: 'rgba(255,255,255,0.1)',
-                    '&:hover': { bgcolor: 'rgba(255,255,255,0.2)', borderColor: 'white' }
+                    px: 5, py: 1.8, 
+                    fontWeight: 700,
+                    borderRadius: 2,
+                    fontSize: '1.2rem',
+                    backdropFilter: 'blur(20px)',
+                    transition: 'all 0.3s',
+                    '&:hover': { bgcolor: 'rgba(109, 109, 110, 0.4)', transform: 'scale(1.03)' }
                   }}
                 >
                   More Info
@@ -258,13 +289,24 @@ const Home = () => {
       )}
 
       {/* ===== MOVIE ROWS ===== */}
-      <Box sx={{ mt: -15, position: 'relative', zIndex: 10, pb: 10, display: 'flex', flexDirection: 'column', gap: 6 }}>
-        {trending.length > 0 && <MovieRow title="🔥 Trending Now" movies={trending} />}
-        {topRated.length > 0 && <MovieRow title="⭐ Top Rated Classics" movies={topRated} />}
-        {newReleases.length > 0 && <MovieRow title="🆕 New Arrivals" movies={newReleases} />}
-        {actionMovies.length > 0 && <MovieRow title="💥 High Octane Action" movies={actionMovies} />}
-        {sciFiMovies.length > 0 && <MovieRow title="🚀 Sci-Fi & Other Worlds" movies={sciFiMovies} />}
-        {dramaMovies.length > 0 && <MovieRow title="🎭 Critically Acclaimed Dramas" movies={dramaMovies} />}
+      <Box sx={{ mt: { xs: -5, md: -10 }, position: 'relative', zIndex: 10, pb: 10, display: 'flex', flexDirection: 'column', gap: 1 }}>
+        {/* Trending First (Preloaded) */}
+        {trending.length > 0 && (
+          <Box sx={{ mb: 4 }}>
+             <MovieRow title="🔥 Trending Now" movies={trending} />
+          </Box>
+        )}
+
+        {/* Lazy Loaded Rows */}
+        <LazyRow id="topRated" title="⭐ Top Rated Classics" sort="-rating" />
+        <LazyRow id="newReleases" title="🆕 New Arrivals" sort="-releaseDate" />
+        <LazyRow id="action" title="💥 High Octane Action" genre="Action" />
+        <LazyRow id="scifi" title="🚀 Sci-Fi & Other Worlds" genre="Sci-Fi" />
+        <LazyRow id="drama" title="🎭 Critically Acclaimed Dramas" genre="Drama" />
+        <LazyRow id="comedy" title="🤣 Laugh Out Loud" genre="Comedy" />
+        <LazyRow id="horror" title="👻 Chills & Thrills" genre="Horror" />
+        <LazyRow id="thriller" title="🔪 Edge of Your Seat" genre="Thriller" />
+        <LazyRow id="romance" title="❤️ Love is in the Air" genre="Romance" />
       </Box>
     </Box>
   );

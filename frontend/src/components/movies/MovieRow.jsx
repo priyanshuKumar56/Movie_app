@@ -1,8 +1,8 @@
 import React, { useRef, useState } from 'react';
 import { Box, Typography, IconButton } from '@mui/material';
-import { ArrowBackIosNewRounded, ArrowForwardIosRounded, StarRounded, PlayCircleFilledWhiteRounded } from '@mui/icons-material';
+import { ArrowBackIosNewRounded, ArrowForwardIosRounded, NavigateNextRounded } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import MovieCard from './MovieCard';
 
 const MovieRow = ({ title, movies }) => {
   const rowRef = useRef(null);
@@ -18,44 +18,68 @@ const MovieRow = ({ title, movies }) => {
     }
   };
 
-  return (
-    <Box sx={{ position: 'relative', px: { xs: 2, md: 6 } }}>
-      <Typography 
-        variant="h5" 
-        sx={{ 
-          mb: 2, 
-          fontWeight: 700, 
-          fontFamily: 'Space Grotesk',
-          fontSize: { xs: '1.2rem', md: '1.5rem' },
-          color: 'rgba(255,255,255,0.9)',
-          borderLeft: '4px solid #00D1FF',
-          pl: 2
-        }}
-      >
-        {title}
-      </Typography>
+  if (!movies || movies.length === 0) return null;
 
-      <Box sx={{ position: 'relative', '&:hover .nav-arrow': { opacity: 1 } }}>
+  return (
+    <Box sx={{ position: 'relative', px: { xs: 2, md: 6 }, mb: 4 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+          <Typography 
+            variant="h5" 
+            sx={{ 
+              fontWeight: 700, 
+              fontFamily: 'Space Grotesk',
+              fontSize: { xs: '1.2rem', md: '1.5rem' },
+              color: 'rgba(255,255,255,0.95)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1
+            }}
+          >
+            <Box component="span" sx={{ width: 4, height: 24, bgcolor: '#00D1FF', borderRadius: 1 }} />
+            {title}
+          </Typography>
+
+          <Box 
+            sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                cursor: 'pointer', 
+                color: '#00D1FF', 
+                opacity: 0, 
+                transition: 'all 0.3s',
+                transform: 'translateX(-10px)',
+                '.row-container:hover &': { opacity: 1, transform: 'translateX(0)' }
+            }}
+            onClick={() => navigate('/browse')}
+            className="explore-link"
+          >
+              <Typography variant="body2" fontWeight="bold">Explore All</Typography>
+              <NavigateNextRounded />
+          </Box>
+      </Box>
+
+      <Box className="row-container" sx={{ position: 'relative', '&:hover .nav-arrow': { opacity: 1 } }}>
         {/* Left Arrow */}
         <IconButton 
           className="nav-arrow"
           onClick={() => handleClick('left')}
           sx={{ 
             position: 'absolute', 
-            left: -25, 
+            left: -20, 
             top: '50%', 
             transform: 'translateY(-50%)',
             zIndex: 40,
             color: 'white',
-            bgcolor: 'rgba(20,20,20,0.8)',
-            border: '1px solid #333',
+            bgcolor: 'rgba(5,5,5,0.8)',
+            border: '1px solid rgba(255,255,255,0.1)',
             opacity: 0,
             transition: 'all 0.2s',
+            backdropFilter: 'blur(5px)',
             display: !isMoved ? 'none' : 'flex',
             '&:hover': { bgcolor: '#00D1FF', color: 'black', borderColor: '#00D1FF' }
           }}
         >
-          <ArrowBackIosNewRounded />
+          <ArrowBackIosNewRounded fontSize="small" />
         </IconButton>
 
         {/* Movie Cards Container */}
@@ -63,75 +87,19 @@ const MovieRow = ({ title, movies }) => {
           ref={rowRef}
           sx={{ 
             display: 'flex', 
-            gap: 2, 
+            gap: 2.5, 
             overflowX: 'auto', 
             scrollbarWidth: 'none',
             '&::-webkit-scrollbar': { display: 'none' },
-            pb: 4, // Space for hover zoom
+            pb: 4,
             pt: 1,
             px: 1
           }}
         >
           {movies.map((movie) => (
-            <motion.div
-              key={movie._id}
-              whileHover={{ scale: 1.05, y: -5 }}
-              transition={{ duration: 0.2 }}
-              style={{ flexShrink: 0, cursor: 'pointer' }}
-              onClick={() => navigate(`/movies/${movie._id}`)}
-            >
-              <Box 
-                sx={{ 
-                  position: 'relative',
-                  width: { xs: 150, md: 200 },
-                  height: { xs: 225, md: 300 },
-                  borderRadius: 3,
-                  overflow: 'hidden',
-                  boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
-                  bgcolor: '#1a1a1a'
-                }}
-              >
-                <Box
-                  component="img"
-                  src={movie.posterUrl || 'https://via.placeholder.com/200x300'}
-                  alt={movie.title}
-                  sx={{ 
-                    width: '100%', 
-                    height: '100%', 
-                    objectFit: 'cover',
-                  }}
-                />
-                
-                {/* Hover Overlay */}
-                <Box 
-                  sx={{ 
-                    position: 'absolute',
-                    inset: 0,
-                    background: 'linear-gradient(to top, rgba(0,0,0,0.95), rgba(0,0,0,0.6), transparent)',
-                    opacity: 0,
-                    transition: 'opacity 0.2s',
-                    '&:hover': { opacity: 1 },
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'flex-end',
-                    p: 2
-                  }}
-                >
-                  <PlayCircleFilledWhiteRounded sx={{ fontSize: 40, color: '#00D1FF', mb: 'auto', alignSelf: 'center', mt: 'auto', opacity: 0.8 }} />
-                  
-                  <Typography variant="body1" fontWeight="bold" noWrap sx={{ mb: 0.5 }}>{movie.title}</Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'space-between' }}>
-                     <Typography variant="caption" color="rgba(255,255,255,0.7)">
-                       {new Date(movie.releaseDate).getFullYear()} • {movie.genres?.[0]}
-                     </Typography>
-                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                       <StarRounded sx={{ fontSize: 14, color: '#FFD700' }} />
-                       <Typography variant="caption" fontWeight="bold" color="#FFD700">{movie.rating}</Typography>
-                     </Box>
-                  </Box>
-                </Box>
-              </Box>
-            </motion.div>
+            <Box key={movie._id} sx={{ minWidth: { xs: 140, sm: 180, md: 220 }, width: { xs: 140, sm: 180, md: 220 } }}>
+               <MovieCard movie={movie} />
+            </Box>
           ))}
         </Box>
 
@@ -141,19 +109,20 @@ const MovieRow = ({ title, movies }) => {
           onClick={() => handleClick('right')}
           sx={{ 
             position: 'absolute', 
-            right: -25, 
+            right: -20, 
             top: '50%', 
             transform: 'translateY(-50%)',
             zIndex: 40,
             color: 'white',
-            bgcolor: 'rgba(20,20,20,0.8)',
-            border: '1px solid #333',
+            bgcolor: 'rgba(5,5,5,0.8)',
+            border: '1px solid rgba(255,255,255,0.1)',
             opacity: 0,
             transition: 'all 0.2s',
+            backdropFilter: 'blur(5px)',
             '&:hover': { bgcolor: '#00D1FF', color: 'black', borderColor: '#00D1FF' }
           }}
         >
-          <ArrowForwardIosRounded />
+          <ArrowForwardIosRounded fontSize="small" />
         </IconButton>
       </Box>
     </Box>
