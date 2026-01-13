@@ -104,7 +104,7 @@ router.delete('/favorites/:movieId', authenticate, async (req, res) => {
 router.get('/favorites', authenticate, async (req, res) => {
   try {
     const user = await User.findById(req.user._id)
-      .populate('favorites', 'title posterUrl rating duration genres')
+      .populate('favorites', 'title posterUrl rating duration genres releaseDate')
       .select('favorites');
 
     res.status(200).json({
@@ -172,7 +172,7 @@ router.delete('/watchlist/:movieId', authenticate, async (req, res) => {
 router.get('/watchlist', authenticate, async (req, res) => {
   try {
     const user = await User.findById(req.user._id)
-      .populate('watchlist', 'title posterUrl rating duration genres')
+      .populate('watchlist', 'title posterUrl rating duration genres releaseDate')
       .select('watchlist');
 
     res.status(200).json({

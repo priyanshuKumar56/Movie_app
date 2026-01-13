@@ -21,13 +21,13 @@ import { getProfile } from './app/slices/authSlice';
 
 function App() {
   const dispatch = useDispatch();
-  const { isAuthenticated, token } = useSelector((state) => state.auth);
+  const { isAuthenticated, token, user } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    if (token && !isAuthenticated) {
+    if (token && !user) {
       dispatch(getProfile());
     }
-  }, [dispatch, token, isAuthenticated]);
+  }, [dispatch, token, user]);
 
   const theme = createTheme({
     palette: {

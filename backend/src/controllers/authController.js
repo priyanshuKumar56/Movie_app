@@ -217,9 +217,9 @@ exports.refreshToken = async (req, res) => {
 exports.getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user._id)
-      .populate('watchHistory.movie', 'title posterUrl rating')
-      .populate('favorites', 'title posterUrl rating')
-      .populate('watchlist', 'title posterUrl rating');
+      .populate('watchHistory.movie', 'title posterUrl rating releaseDate genres duration')
+      .populate('favorites', 'title posterUrl rating releaseDate genres duration')
+      .populate('watchlist', 'title posterUrl rating releaseDate genres duration');
 
     const userObj = user.toObject();
     userObj.id = user._id;
