@@ -74,8 +74,16 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // ============================================
-// HEALTH CHECK
+// HEALTH CHECK & ROOT
 // ============================================
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'success',
+    message: 'Movie App API is running',
+    version: process.env.API_VERSION || 'v1',
+  });
+});
+
 app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'success',
@@ -148,7 +156,7 @@ process.on('SIGTERM', async () => {
   await mongoose.connection.close();
   const { getRedisClient } = require('./config/redis');
   const redisClient = getRedisClient();
-  if (redisClient) {
+  if (redisClient && redisClient.isOpen) {
     await redisClient.quit();
   }
   process.exit(0);
@@ -159,7 +167,7 @@ process.on('SIGINT', async () => {
   await mongoose.connection.close();
   const { getRedisClient } = require('./config/redis');
   const redisClient = getRedisClient();
-  if (redisClient) {
+  if (redisClient && redisClient.isOpen) {
     await redisClient.quit();
   }
   process.exit(0);
