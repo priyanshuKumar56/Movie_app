@@ -63,7 +63,41 @@ npm start
 
 ---
 
-## 🐳 Docker Setup (Recommended / Alternative Method)
+## � Admin & Database Setup
+
+To fully functionalize the application, you need to create an administrator and populate the database with movie data.
+
+### 1. Create an Admin Account
+Run the following command in the `backend` directory to create a default admin user.
+```bash
+cd backend
+npm run admin:create
+```
+- **Default Credentials:**
+  - **Email:** `admin@movieapp.com`
+  - **Password:** `admin123`
+
+*To use custom credentials:*
+```bash
+node create_admin.js <email> <password> "<name>"
+```
+
+### 2. Seed Movie Data
+Populate your database with the IMDb Top 250 dataset.
+```bash
+cd backend
+npm run db:seed
+```
+
+### 3. Accessing the Admin Panel
+Once you have created an admin account:
+1. Go to the login page: [http://localhost:3000/admin/login](http://localhost:3000/admin/login)
+2. Log in with your admin credentials.
+3. If your account has the `ADMIN` role, you will be able to access the Admin Dashboard at: [http://localhost:3000/admin](http://localhost:3000/admin) (or via the user profile menu).
+
+---
+
+## �🐳 Docker Setup (Recommended / Alternative Method)
 
 For a hassle-free setup that ensures consistency across different environments, use Docker. This method sets up the Frontend, Backend, MongoDB, and Redis containers automatically.
 

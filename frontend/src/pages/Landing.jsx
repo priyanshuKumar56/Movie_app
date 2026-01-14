@@ -238,7 +238,7 @@ const Landing = () => {
                 animate={{ opacity: 1, y: 0, rotate: 0 }} 
                 transition={{ duration: 1, type: "spring" }}
               >
-                <Box sx={{ position: 'relative', perspective: '1000px', transformStyle: 'preserve-3d' }}>
+                <Box sx={{ position: 'relative', perspective: '1000px', transformStyle: 'preserve-3d', maxWidth: 550, mx: 'auto' }}>
                   {/* Floating Cards Effect */}
                   <Card sx={{ 
                     position: 'relative', 
