@@ -11,7 +11,9 @@
     "lint": "eslint src/**/*.js",
     "lint:fix": "eslint src/**/*.js --fix",
     "seed": "node src/scripts/seedMovies.js",
-    "sync:imdb": "node src/scripts/syncImdb.js"
+    "sync:imdb": "node src/scripts/syncImdb.js",
+    "admin:create": "node create_admin.js",
+    "db:seed": "node seed_movies.js"
   },
   "nodemonConfig": {
     "ignore": [
