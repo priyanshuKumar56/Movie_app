@@ -29,8 +29,26 @@ app.use(helmet({
 }));
 
 // CORS
+const allowedOrigins = [
+  'https://movie-app-iota-orpin.vercel.app',
+  'http://localhost:3000',
+  'http://localhost:5173'
+];
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'https://movie-app-iota-orpin.vercel.app/',
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Normalize origin by removing trailing slash
+    const normalizedOrigin = origin.endsWith('/') ? origin.slice(0, -1) : origin;
+    
+    if (allowedOrigins.includes(normalizedOrigin) || (process.env.CORS_ORIGIN && (process.env.CORS_ORIGIN.replace(/\/$/, '') === normalizedOrigin))) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
 }));
 
